@@ -30,7 +30,6 @@ class HtmlParser {
             var title: String? = null
             val meaning: MutableList<String> = arrayListOf()
 
-
             for (element in wordsElement) {
                 if (element.hasClass("ly_tit")) {
                     title = element.select(".target").text()
