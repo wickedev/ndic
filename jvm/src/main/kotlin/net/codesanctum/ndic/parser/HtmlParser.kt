@@ -27,20 +27,18 @@ class HtmlParser {
         }
 
         for (wordsElement in wordsElements) {
-            var title: String? = null
-            val meaning: MutableList<String> = arrayListOf()
-
             for (element in wordsElement) {
-                if (element.hasClass("ly_tit")) {
-                    title = element.select(".target").text()
-                } else if (element.hasClass("ly_p")) {
-                    val meaningElements = element.select(".ly_p")
-                    for (meaningElement in meaningElements) {
-                        meaning.add(meaningElement.text())
-                    }
+                val meaning: MutableList<String> = arrayListOf()
+                val title = element.select(".target").text()
+                val meaningElements = element.select(".ly_p")
+
+                for (meaningElement in meaningElements) {
+
+                    meaning.add(meaningElement.text())
                 }
+
+                words.add(Word(title, meaning))
             }
-            words.add(Word(title!!, meaning))
         }
 
         return words
