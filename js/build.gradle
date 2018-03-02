@@ -1,0 +1,67 @@
+apply plugin: 'kotlin-platform-js'
+apply plugin: 'com.moowork.node'
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlin_version"
+    testCompile "org.jetbrains.kotlin:kotlin-test-js:$kotlin_version"
+    expectedBy project(':common')
+}
+
+[compileKotlin2Js, compileTestKotlin2Js]*.configure {
+    kotlinOptions.sourceMap = true
+    kotlinOptions.moduleKind = "umd"
+}
+
+task nodeClean(group: 'node') {
+    delete "${project.projectDir}/node_modules"
+    delete "${project.projectDir}/.gradle"
+}
+
+clean.dependsOn nodeClean
+
+task populateNodeModules(type: Copy, dependsOn: compileKotlin2Js) {
+    configurations.compile.each {
+        from zipTree(it.absolutePath).matching {
+            include '*.js'
+            include '*.js.map'
+        }
+    }
+    into "${buildDir}/node_modules"
+}
+
+task populateTestNodeModules(type: Copy, dependsOn: compileKotlin2Js) {
+    from compileKotlin2Js.destinationDir as Object
+    into "${buildDir}/node_modules"
+
+    afterEvaluate {
+        configurations.testCompile.each {
+            from zipTree(it.absolutePath).matching {
+                include '*.js'
+                include '*.js.map'
+            }
+        }
+    }
+}
+
+
+node {
+    version = "$node_version"
+    npmVersion = "$npm_version"
+    download = true
+}
+
+task installDependencies(type: NpmTask) {
+    args = ['install', 'mocha', 'source-map-support', '--no-save']
+}
+
+task run(type: NodeTask, dependsOn: [populateNodeModules, nodeSetup]) {
+    group = 'application'
+    script = compileKotlin2Js.outputFile
+}
+
+task runMocha(type: NodeTask, dependsOn: [compileTestKotlin2Js, populateTestNodeModules, installDependencies]) {
+    script = file('node_modules/mocha/bin/mocha')
+    args = [compileTestKotlin2Js.outputFile, '--require=source-map-support/register']
+}
+
+test.dependsOn runMocha

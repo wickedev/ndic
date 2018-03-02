@@ -1,0 +1,3 @@
+rootProject.name = 'ndic'
+include 'common', 'jvm', 'js'
+

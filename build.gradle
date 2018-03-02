@@ -1,0 +1,23 @@
+buildscript {
+    ext.kotlin_version = '1.2.30'
+
+    repositories {
+        jcenter()
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.moowork.gradle:gradle-node-plugin:1.2.0"
+    }
+}
+
+ext.artifactId = 'ndic'
+
+subprojects {
+    group 'net.codesanctum'
+    version '0.1.0'
+
+    repositories {
+        jcenter()
+    }
+}
