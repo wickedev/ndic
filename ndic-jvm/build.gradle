@@ -1,0 +1,31 @@
+apply plugin: 'application'
+apply plugin: 'kotlin-platform-jvm'
+
+[compileKotlin, compileTestKotlin]*.configure {
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8
+}
+
+def artifactId = rootProject.extensions.getByName("ext").artifactId
+mainClassName = "${group}.${artifactId}.MainKt"
+
+dependencies {
+    expectedBy project(':ndic-common')
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    testCompile "junit:junit:4.12"
+    testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+    testCompile "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
+
+    testCompile('org.jetbrains.spek:spek-api:1.1.5') {
+        exclude group: "org.jetbrains.kotlin"
+    }
+    testCompile('org.jetbrains.spek:spek-junit-platform-engine:1.1.5') {
+        exclude group: "org.jetbrains.kotlin"
+    }
+    testCompile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    testCompile "com.winterbe:expekt:0.5.0"
+    testCompile 'com.google.code.gson:gson:2.8.2'
+
+    // Lib
+    compile 'org.jsoup:jsoup:1.9.1'
+}
