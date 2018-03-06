@@ -1,5 +1,5 @@
 NDic (Naver English/Korean Dictionary) &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/WickeDev/ndic/blob/master/LICENSE) [![Download](https://api.bintray.com/packages/wickedev/maven/ndic-jvm/images/download.svg)](https://bintray.com/wickedev/maven/ndic-jvm/_latestVersion) 
-====
+===============================================
 
 Naver English-Korean dictionary Kotlin(Java compatible) Library
 
@@ -9,7 +9,7 @@ Download
 Gradle:
 ```groovy
 repositories { jcenter() }
-compile 'net.codesanctum:ndic-jvm:0.1.1'
+compile 'net.codesanctum:ndic-jvm:x.y.z'
 ``` 
 
 Examples
@@ -17,12 +17,12 @@ Examples
 
 Kotlin
 ```kotlin
-val words = NDic.search("test") // blocking call
+val words = NDic.search("test") // blocking call, DO NOT USE IN MAIN THREAD!
 ```
 
 Java
 ```
-List<Word> words = NDic.search("test"); // blocking call
+List<Word> words = NDic.search("test"); // blocking call, DO NOT USE IN MAIN THREAD!
 ```
 Result
 ```kotlin

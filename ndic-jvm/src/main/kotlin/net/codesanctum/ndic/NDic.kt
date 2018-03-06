@@ -11,7 +11,9 @@ class NDic {
 
         fun search(query: String): List<Word> {
             val reqUrl = String.format(DICTIONARY_URL, query)
-            val document = Jsoup.connect(reqUrl).get()
+            val document = Jsoup.connect(reqUrl)
+                    .header("User-Agent", "Mozilla/5.0")
+                    .get()
             return resultHtmlParser.parseHtmlToData(document)
         }
     }

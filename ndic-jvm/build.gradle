@@ -94,6 +94,8 @@ bintray {
         licenses = ['MIT']
         labels = ["naver", "dictionary", "ndic"]
         vcsUrl = 'https://github.com/wickedev/ndic.git'
+        websiteUrl = 'https://github.com/wickedev'
+        issueTrackerUrl = 'https://github.com/wickedev/ndic/issues'
         publicDownloadNumbers = true
         version {
             name = project.version
