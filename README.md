@@ -21,7 +21,7 @@ val words = NDic.search("test") // blocking call, DO NOT USE IN MAIN THREAD!
 ```
 
 Java:
-```
+```java
 List<Word> words = NDic.search("test"); // blocking call, DO NOT USE IN MAIN THREAD!
 ```
 Result:
