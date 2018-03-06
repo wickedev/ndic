@@ -1,12 +1,14 @@
 apply plugin: 'application'
 apply plugin: 'kotlin-platform-jvm'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'maven-publish'
 
 [compileKotlin, compileTestKotlin]*.configure {
     kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8
 }
 
-def artifactId = rootProject.extensions.getByName("ext").artifactId
-mainClassName = "${group}.${artifactId}.MainKt"
+def DefartifactId = rootProject.extensions.getByName("ext").artifactId
+mainClassName = "${group}.${DefartifactId}.MainKt"
 
 dependencies {
     expectedBy project(':ndic-common')
@@ -28,4 +30,55 @@ dependencies {
 
     // Lib
     compile 'org.jsoup:jsoup:1.9.1'
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+bintray {
+    user = rootProject.properties['bintray.user']
+    key = rootProject.properties['bintray.apiKey']
+
+    publications = ['mavenJava']   //When uploading Maven-based publication files
+    configurations = ['archives']  //When uploading configuration files
+    pkg {
+        repo = rootProject.properties['bintray.repoName']
+        name = project.name
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/WickeDev/ndic'
+        publicDownloadNumbers = true
+        version {
+            name = project.version
+            desc = project.version
+            vcsTag = project.version
+            gpg {
+                sign = true
+                passphrase = rootProject.properties['bintray.gpgPassword']
+            }
+        }
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            groupId group
+            version project.version
+            artifactId project.name
+        }
+    }
+    println configurations.runtime.allDependencies
 }
