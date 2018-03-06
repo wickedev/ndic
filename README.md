@@ -15,16 +15,16 @@ compile 'net.codesanctum:ndic-jvm:x.y.z'
 Examples
 --------
 
-Kotlin
+Kotlin:
 ```kotlin
 val words = NDic.search("test") // blocking call, DO NOT USE IN MAIN THREAD!
 ```
 
-Java
+Java:
 ```
 List<Word> words = NDic.search("test"); // blocking call, DO NOT USE IN MAIN THREAD!
 ```
-Result
+Result:
 ```kotlin
 data class Word(
         val title: String, // 단어 제목
