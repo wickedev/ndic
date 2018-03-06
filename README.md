@@ -24,7 +24,7 @@ Java
 ```
 List<Word> words = NDic.search("test"); // blocking call
 ```
-
+Result
 ```kotlin
 data class Word(
         val title: String, // 단어 제목
