@@ -25,6 +25,34 @@ Java
 List<Word> words = NDic.search("test"); // blocking call
 ```
 
+```kotlin
+data class Word(
+        val title: String, // 단어 제목
+        val number: Int?, // 몇 번째 단어인지
+        val url: String, // 영어사전 검색 URL
+        val phoneticSymbol: String?, // 발음 기호
+        val pronunciation: String?, // 영어 발음 재생 URL
+        val meanings: List<Meaning> // 의미
+)
+
+data class Meaning(
+        val type: String?, // 품사의 종류
+        val definitions: List<Definition>, // 의미
+        val moreDefinition: MoreDefinition? // 더보기 정보
+)
+
+data class Definition(
+        val def: String, // 의미
+        val exEn: String?, // 영어 예문
+        val exKr: String? // 국어 예문
+)
+
+data class MoreDefinition(
+        val count: Int, // 더보기 개수
+        val url: String // 더보기 URL
+)
+```
+
 License
 =======
 
