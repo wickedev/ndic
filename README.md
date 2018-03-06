@@ -1,7 +1,7 @@
 NDic (Naver English/Korean Dictionary) &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/WickeDev/ndic/blob/master/LICENSE) [![Download](https://api.bintray.com/packages/wickedev/maven/ndic-jvm/images/download.svg)](https://bintray.com/wickedev/maven/ndic-jvm/_latestVersion) 
 ===============================================
 
-Naver English-Korean dictionary Library written by Kotlin
+Naver English-Korean dictionary Library written with Kotlin
 
 Download &middot; [![Download](https://api.bintray.com/packages/wickedev/maven/ndic-jvm/images/download.svg)](https://bintray.com/wickedev/maven/ndic-jvm/_latestVersion)
 --------
