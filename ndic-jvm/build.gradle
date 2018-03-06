@@ -2,6 +2,7 @@ apply plugin: 'application'
 apply plugin: 'kotlin-platform-jvm'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'maven-publish'
+apply plugin: 'maven'
 
 [compileKotlin, compileTestKotlin]*.configure {
     kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8
@@ -47,17 +48,52 @@ artifacts {
     archives javadocJar
 }
 
+
+install {
+    repositories.mavenInstaller.pom.project {
+        //noinspection GroovyAssignabilityCheck
+        name project.name
+        description 'Naver English-Korean dictionary Kotlin(Java compatible) Library'
+        url 'https://github.com/wickedev/ndic'
+
+        licenses {
+            license {
+                //noinspection GroovyAssignabilityCheck
+                name 'The MIT License'
+                url 'https://github.com/WickeDev/ndic/blob/master/LICENSE'
+            }
+        }
+        developers {
+            developer {
+                id 'wickdev'
+                //noinspection GroovyAssignabilityCheck
+                name 'Ryan Yang'
+                email 'orange881217@gmail.com'
+            }
+        }
+        scm {
+            connection "scm:git:git@github.com:wickedev/ndic.git"
+            developerConnection "scm:git:git@github.com:wickedev/ndic.git"
+            url "scm:git:git@github.com:wickedev/ndic.git"
+        }
+        issueManagement {
+            system "github"
+            url "https://github.com/wickedev/ndic/issues"
+        }
+    }
+}
+
 bintray {
     user = rootProject.properties['bintray.user']
     key = rootProject.properties['bintray.apiKey']
-
-    publications = ['mavenJava']   //When uploading Maven-based publication files
     configurations = ['archives']  //When uploading configuration files
+    publish = true
     pkg {
         repo = rootProject.properties['bintray.repoName']
         name = project.name
         licenses = ['MIT']
-        vcsUrl = 'https://github.com/WickeDev/ndic'
+        labels = ["naver", "dictionary", "ndic"]
+        vcsUrl = 'https://github.com/wickedev/ndic.git'
         publicDownloadNumbers = true
         version {
             name = project.version
@@ -80,5 +116,4 @@ publishing {
             artifactId project.name
         }
     }
-    println configurations.runtime.allDependencies
 }
