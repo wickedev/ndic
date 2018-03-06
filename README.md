@@ -12,7 +12,7 @@ maven { url 'https://dl.bintray.com/wickedev/maven/' }
 compile 'net.codesanctum:ndic-jvm:0.1.0'
 ``` 
 
-Download
+Examples
 --------
 
 Kotlin
