@@ -3,7 +3,7 @@ NDic (Naver English/Korean Dictionary) &middot; [![GitHub license](https://img.s
 
 Naver English-Korean dictionary Kotlin(Java compatible) Library
 
-Download [![Download](https://api.bintray.com/packages/wickedev/maven/ndic-jvm/images/download.svg)](https://bintray.com/wickedev/maven/ndic-jvm/_latestVersion)
+Download &middot; [![Download](https://api.bintray.com/packages/wickedev/maven/ndic-jvm/images/download.svg)](https://bintray.com/wickedev/maven/ndic-jvm/_latestVersion)
 --------
 
 Gradle:
