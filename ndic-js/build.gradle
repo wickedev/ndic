@@ -50,17 +50,23 @@ node {
     download = true
 }
 
-task installDependencies(type: NpmTask) {
+task installMochaDependencies(type: NpmTask) {
     if (file("${project.projectDir}/node_modules/bin/mocha").exists()) return
     args = ['install', 'mocha', 'source-map-support', '--no-save']
 }
+
+task installDependencies(type: NpmTask) {
+    args = ['install']
+}
+
+build.dependsOn installDependencies
 
 task run(type: NodeTask, dependsOn: [populateNodeModules, nodeSetup]) {
     group = 'application'
     script = compileKotlin2Js.outputFile
 }
 
-task runMocha(type: NodeTask, dependsOn: [compileTestKotlin2Js, populateTestNodeModules, installDependencies]) {
+task runMocha(type: NodeTask, dependsOn: [compileTestKotlin2Js, populateTestNodeModules, installMochaDependencies]) {
     script = file('node_modules/mocha/bin/mocha')
     args = [compileTestKotlin2Js.outputFile, '--require=source-map-support/register']
 }

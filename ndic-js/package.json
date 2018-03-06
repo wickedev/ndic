@@ -8,6 +8,7 @@
     "@types/sprintf": "^0.1.0",
     "axios": "^0.18.0",
     "cheerio": "^1.0.0-rc.2",
+    "requirejs": "^2.3.5",
     "source-map-support": "^0.5.3",
     "sprintf-js": "^1.1.1"
   },
