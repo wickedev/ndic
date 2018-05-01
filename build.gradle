@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.2.30'
+    ext.kotlin_version = '1.2.41'
 
     repositories {
         jcenter()
@@ -12,11 +12,25 @@ buildscript {
     }
 }
 
+group 'net.codesanctum'
 ext.artifactId = 'ndic'
+version '0.1.0'
 
-subprojects {
-    group 'net.codesanctum'
-    version '0.1.0'
+repositories {
+    jcenter()
+}
+
+apply plugin: 'kotlin-platform-common'
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version"
+    testCompile "org.jetbrains.kotlin:kotlin-test-annotations-common:$kotlin_version"
+    testCompile "org.jetbrains.kotlin:kotlin-test-common:$kotlin_version"
+}
+
+subprojects { sub ->
+    group group
+    version version
 
     repositories {
         jcenter()

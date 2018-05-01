@@ -1,4 +1,4 @@
-@file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION", "NESTED_CLASS_IN_EXTERNAL_INTERFACE", "unused")
+@file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION", "NESTED_CLASS_IN_EXTERNAL_INTERFACE", "unused", "DEPRECATION")
 
 package js.externals.cheerio
 
@@ -183,8 +183,6 @@ external interface Selector {
     operator fun invoke(selector: String, context: Elements, root: String): Elements
 
     operator fun invoke(selector: Any): Elements
-
-
 }
 
 fun Selector.select(selector: String): Elements = invoke(selector)

@@ -12,7 +12,7 @@ def DefartifactId = rootProject.extensions.getByName("ext").artifactId
 mainClassName = "${group}.${DefartifactId}.MainKt"
 
 dependencies {
-    expectedBy project(':ndic-common')
+    expectedBy project(':')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     testCompile "junit:junit:4.12"

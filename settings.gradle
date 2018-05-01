@@ -1,3 +1,6 @@
 rootProject.name = 'ndic'
-include 'ndic-common', 'ndic-jvm', 'ndic-js'
+include 'ndic-browser'
+include 'ndic-node'
+include 'ndic-jvm'
+
 
