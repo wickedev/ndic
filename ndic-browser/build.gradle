@@ -1,88 +1,49 @@
+plugins {
+    id 'com.craigburke.karma' version '1.4.4'
+}
 apply plugin: 'kotlin-platform-js'
-apply plugin: 'com.moowork.node'
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlin_version"
     testCompile "org.jetbrains.kotlin:kotlin-test-js:$kotlin_version"
     expectedBy project(':')
-
-    compile 'org.webjars.npm:sprintf-js:1.1.1'
-    compile 'org.webjars.npm:axios:0.17.1'
-    compile 'org.webjars.npm:cheerio:0.19.0'
-
-    testCompile 'org.webjars.npm:source-map-support:0.5.3'
-    testCompile 'org.webjars.npm:mocha:5.0.2'
 }
 
-[compileKotlin2Js, compileTestKotlin2Js]*.configure {
+compileKotlin2Js.configure {
     kotlinOptions.sourceMap = true
-    kotlinOptions.moduleKind = "umd"
+    kotlinOptions.moduleKind = "plain"
 }
 
-node {
-    version = "$node_version"
-    npmVersion = "$npm_version"
-    nodeModulesDir = file("build/node_modules")
-    download = true
-}
+def libDir = "$buildDir/lib"
+def compileOutput = compileKotlin2Js.outputFile
+def testOutput = compileTestKotlin2Js.outputFile
 
-def collectAllDependencies(Set<ResolvedDependency> deps) {
-    def subDeps = deps.collect() { it.children }
-            .flatten()
-            .toSet() as Set<ResolvedDependency>
-
-    if (subDeps.size() > 0) {
-        return [deps, collectAllDependencies(subDeps)].flatten() as Set<ResolvedDependency>
-    } else {
-        return deps
-    }
-}
-
-task populateWebJars(type: Copy, dependsOn: [build]) {
-    def nodeModules = "${buildDir}/node_modules"
-
-    afterEvaluate {
-        def dependencies = collectAllDependencies(configurations.testCompile
-                .resolvedConfiguration.firstLevelModuleDependencies)
-        dependencies.each { dep ->
-            //noinspection GroovyAssignabilityCheck
-            def jarFile = dep.moduleArtifacts[0].file
-            if (!jarFile.exists()) return
-            zipTree(jarFile).visit {
-                if (it.file.name == 'webjars') {
-                    it.file.listFiles().each { module ->
-                        def version = dep.moduleVersion
-                        def directory = file("${module.path}/${version}")
-                        directory.renameTo("${nodeModules}/${module.name}")
-                    }
-                }
-            }
-        }
+task populateNodeModules(type: Copy, dependsOn: compileKotlin2Js) {
+    configurations.testCompile.each {
+        from zipTree(it.absolutePath).matching { include '*.js' }
     }
 
-    into nodeModules
+    into libDir
 }
 
-task populateNodeModules(type: Copy, dependsOn: [compileKotlin2Js, compileTestKotlin2Js]) {
-    def nodeModules = "${buildDir}/node_modules"
-    from "${compileKotlin2Js.destinationDir}"
-    from "${compileTestKotlin2Js.destinationDir}"
+karma {
+    dependencies(['mocha'])
 
-    afterEvaluate {
-        configurations.testCompile.each {
-            from zipTree(it).matching {
-                include '*.js'
-                include '*.js.map'
-            }
-        }
-    }
+    frameworks = ['mocha']
+    browsers = ['Chrome']
 
-    into nodeModules
+    files = [
+            "$libDir/kotlin.js",
+            "$libDir/kotlin-test.js",
+            "$compileOutput",
+            "$testOutput"
+    ]
 }
 
-task runMocha(type: NodeTask, dependsOn: [populateNodeModules]) {
-    script = file("${buildDir}/node_modules/mocha/bin/mocha")
-    args = [compileTestKotlin2Js.outputFile, '--require=source-map-support/register']
+karmaRun {
+    dependsOn compileTestKotlin2Js
+    dependsOn populateNodeModules
 }
 
-test.dependsOn runMocha
+test.dependsOn karmaRun
+clean.dependsOn karmaClean
