@@ -14,6 +14,7 @@ class NDic {
             val document = Jsoup.connect(reqUrl)
                     .header("User-Agent", "Mozilla/5.0")
                     .get()
+            println(document.toString())
             return resultHtmlParser.parseHtmlToData(document)
         }
     }

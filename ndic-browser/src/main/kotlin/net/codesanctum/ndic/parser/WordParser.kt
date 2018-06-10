@@ -1,34 +1,36 @@
 package net.codesanctum.ndic.parser
 
-import js.externals.cheerio.Elements
 import net.codesanctum.ndic.util.emptyToNull
 import net.codesanctum.ndic.util.toNullOrInt
 import net.codesanctum.ndic.vo.Word
+import org.w3c.dom.HTMLElement
 
 
 class WordParser(private val meaningParser: MeaningParser) {
 
-    fun parse(wordElement: Elements, meaningElement: Elements): Word {
+    fun parse(wordElement: HTMLElement?, meaningElement: HTMLElement?): Word {
 
-        val title = wordElement.find(".t1 strong").text()
-                .let {
+        val wrapper = wrapper(wordElement)
+
+        val title = wrapper.find(".t1 strong")
+                .text().let {
                     if (it.isEmpty()) {
-                        wordElement.find(".t1 a").text()
+                        wrapper.find(".t1 a").text()
                     } else {
                         it
                     }
                 }
-        val number = wordElement.find(".t1 sup").text()
-        val url = wordElement.find(".t1 a").attr("href")
-        val phoneticSymbol = wordElement.find(".t2").text()
-        val pronunciation = wordElement.find("#pron_en").attr("playlist")
+        val number = wrapper.find(".t1 sup").text()
+        val url = wrapper.find(".t1 a").attr("href")!!
+        val phoneticSymbol = wrapper.find(".t2").text()
+        val pronunciation = wrapper.find("#pron_en").attr("playlist")
         val meaning = meaningParser.parse(meaningElement)
 
         return Word(title = title,
                 number = number.toNullOrInt(),
                 url = url,
                 phoneticSymbol = phoneticSymbol.emptyToNull(),
-                pronunciation = pronunciation.emptyToNull(),
+                pronunciation = pronunciation?.emptyToNull(),
                 meanings = meaning)
     }
 }

@@ -2,31 +2,24 @@
 
 package net.codesanctum.ndic
 
-import org.w3c.xhr.XMLHttpRequest
-import kotlin.js.Promise
+import kotlinx.coroutines.experimental.asDeferred
+import kotlinx.coroutines.experimental.promise
+import net.codesanctum.ndic.NDic.Companion.search
 import kotlin.test.Test
 
 class ResultHtmlParserTest {
 
     @Test
-    fun xhr(tes: Int) {
-        println("\n------------------- XHR -------------------\n\n")
-        Promise<String>({ resolve, reject ->
-            val xhr = XMLHttpRequest()
-            xhr.open("GET", "http://endic.naver.com/searchAssistDict.nhn?query=%s")
-            xhr.onload = {
-                if (xhr.status == 200.toShort()) {
-                    resolve(xhr.responseText)
-                } else {
-                    reject(Error("[status: ${xhr.status}]: ${xhr.statusText}"))
-                }
-            }
-            xhr.send()
-        }).then {
-            println(it)
-        }.catch {
-            println(it)
-        }
-        println("\n------------------- XHR -------------------\n\n")
+    fun xhr() = promise {
+        val request = search("test").asDeferred()
+        val response = request.await()
+        println(JSON.stringify(response, replacer, 4))
+        // assertTrue(response.isNotEmpty())
+    }
+
+    private val replacer: ((key: String, value: Any?) -> Any?) = { _: String, value: Any? ->
+        if (value === null) undefined
+        value
     }
 }
+

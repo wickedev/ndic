@@ -1,7 +1,7 @@
 package net.codesanctum.ndic
 
 
-import js.externals.axios.Axios
+import js.externals.jquery.jQuery
 import net.codesanctum.ndic.parser.ResultHtmlParser
 import net.codesanctum.ndic.vo.Word
 import kotlin.js.Promise
@@ -10,13 +10,12 @@ class NDic {
     companion object {
         private val resultHtmlParser: ResultHtmlParser = ResultHtmlParser.create()
 
-        fun search(query: String): Promise<List<Word>> {
-            val request = Axios.get<String>("http://endic.naver.com/searchAssistDict.nhn?query=$query")
-            return Promise.resolve(request)
+        fun search(keyword: String): Promise<List<Word>> {
+            return jQuery.get("http://endic.naver.com/searchAssistDict.nhn?query=$keyword")
                     .then {
-                        resultHtmlParser.parseHtmlToData(it.data)
+                        val result = it as String
+                        return@then resultHtmlParser.parseHtmlToData(result)
                     }
         }
     }
 }
-

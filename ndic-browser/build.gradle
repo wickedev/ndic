@@ -3,8 +3,18 @@ plugins {
 }
 apply plugin: 'kotlin-platform-js'
 
+repositories {
+    jcenter()
+    maven { url "https://kotlin.bintray.com/js-externals" }
+}
+
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlin_version"
+
+    compile 'org.webjars:jquery:3.3.1-1'
+    compile "kotlin.js.externals:kotlin-js-jquery:3.2.0-0"
+
+    compile 'org.jetbrains.kotlinx:kotlinx-coroutines-core-js:0.22.5'
     testCompile "org.jetbrains.kotlin:kotlin-test-js:$kotlin_version"
     expectedBy project(':')
 }
@@ -18,6 +28,52 @@ def libDir = "$buildDir/lib"
 def compileOutput = compileKotlin2Js.outputFile
 def testOutput = compileTestKotlin2Js.outputFile
 
+node {
+    download false
+}
+
+karma {
+    //dependencies(['mocha', 'karma-chrome-launcher'])
+
+    frameworks = ['mocha']
+    browsers = ['ChromeWithoutSecurity']
+    basePath = 'build'
+
+    propertyMissing('customLaunchers', {
+        ChromeWithoutSecurity {
+            base 'Chrome'
+            flags(['--disable-web-security'])
+        }
+    })
+
+    propertyMissing('client', {
+        mocha {
+            timeout 10000
+        }
+    })
+
+    files = [
+            "$libDir/webjar/**/jquery.js",
+            "$libDir/kotlin.js",
+            "$libDir/kotlin-test.js",
+            "$libDir/kotlinx-coroutines-core.js",
+            "$compileOutput",
+            "$testOutput"
+    ]
+}
+
+Set<ResolvedDependency> collectAllDependencies(Set<ResolvedDependency> deps) {
+    def subDeps = deps.collect() { it.children }
+            .flatten()
+            .toSet() as Set<ResolvedDependency>
+
+    if (subDeps.size() > 0) {
+        return [deps, collectAllDependencies(subDeps)].flatten() as Set<ResolvedDependency>
+    } else {
+        return deps
+    }
+}
+
 task populateNodeModules(type: Copy, dependsOn: compileKotlin2Js) {
     configurations.testCompile.each {
         from zipTree(it.absolutePath).matching { include '*.js' }
@@ -26,24 +82,77 @@ task populateNodeModules(type: Copy, dependsOn: compileKotlin2Js) {
     into libDir
 }
 
-karma {
-    dependencies(['mocha'])
+class Webjar {
+    String name
+    String version
+    ResolvedDependency dep
+    File dir
 
-    frameworks = ['mocha']
-    browsers = ['Chrome']
-
-    files = [
-            "$libDir/kotlin.js",
-            "$libDir/kotlin-test.js",
-            "$compileOutput",
-            "$testOutput"
-    ]
+    @Override
+    String toString() {
+        return "{ name: $name, version: $version, dep: $dep, dir: $dir }"
+    }
 }
+
+task unpackJar(type: Copy, dependsOn: populateNodeModules) {
+    def dependencies = collectAllDependencies(configurations.testCompile
+            .resolvedConfiguration.firstLevelModuleDependencies)
+    def webjars = collectWebjars(dependencies)
+
+    webjars.collect { it.dir }.each {
+        from it
+    }
+
+    into "$libDir/webjar"
+}
+
+List<Webjar> collectWebjars(Set<ResolvedDependency> dependencies) {
+    List<Webjar> webjars = new ArrayList()
+
+    dependencies.forEach { dep ->
+        def jarFile = dep.moduleArtifacts[0].file
+        if (!jarFile.exists()) {
+            return
+        }
+
+        zipTree(jarFile).visit { it ->
+            if (it.file.name == 'webjars') {
+                webjars.add(new Webjar(name: dep.name.split(":")[1],
+                        version: dep.moduleVersion,
+                        dep: dep, dir: it.file))
+            }
+        }
+
+    }
+    return webjars
+}
+
+/*task populateWebJars(dependsOn: unpackJar) {
+
+    def dependencies = collectAllDependencies(configurations.testCompile
+            .resolvedConfiguration.firstLevelModuleDependencies)
+
+    def webjars = collectWebjars(dependencies)
+
+    webjars.forEach { webjar ->
+        println("$webjar")
+        file("$libDir/webjar/$webjar.name/$webjar.version")
+                .renameTo("$libDir/$webjar.name")
+
+        file("$webjar.dir/$webjar.name/$webjar.version")
+                .renameTo("$libDir/$webjar.name")
+    }
+}*/
 
 karmaRun {
     dependsOn compileTestKotlin2Js
-    dependsOn populateNodeModules
+    dependsOn unpackJar
 }
-
 test.dependsOn karmaRun
 clean.dependsOn karmaClean
+
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
+}

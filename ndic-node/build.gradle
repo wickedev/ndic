@@ -50,7 +50,7 @@ task populateWebJars(type: Copy, dependsOn: [build]) {
             if (!jarFile.exists()) return
             zipTree(jarFile).visit {
                 if (it.file.name == 'webjars') {
-                    it.file.listFiles().each { module ->
+                    it.file.listFiles().each { File module ->
                         def version = dep.moduleVersion
                         def directory = file("${module.path}/${version}")
                         directory.renameTo("${nodeModules}/${module.name}")
